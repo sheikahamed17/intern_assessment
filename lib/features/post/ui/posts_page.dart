@@ -27,11 +27,6 @@ class _PostsPageState extends State<PostsPage> {
     var ScreenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              postsBloc.add(PostAddEvent());
-            },
-          ),
           body: BlocConsumer<PostsBloc, PostsState>(
               bloc: postsBloc,
               listenWhen: (previous, current) => current is PostsActionState,
@@ -120,7 +115,7 @@ class _PostsPageState extends State<PostsPage> {
                               },
                             ),
                           ),
-                          Container(
+                          SizedBox(
                             height: MediaQuery.of(context).size.height / 2,
                             width: MediaQuery.of(context).size.height / 2,
                             child: Padding(
@@ -132,12 +127,19 @@ class _PostsPageState extends State<PostsPage> {
                                   itemBuilder: (context, index) {
                                     print(successState.posts[index].title);
                                     return Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: const BorderSide(width: 0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                      elevation: 1,
+                                      color: const Color(0xfff1f1f4),
                                       child: ListTile(
                                         leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              successState
+                                                  .posts[index].thumbnailUrl),
                                           backgroundColor: Colors.white,
                                           radius: ScreenSize.height * 0.025,
-                                          child: Image.network(successState
-                                              .posts[index].thumbnailUrl),
                                         ),
                                         style: ListTileStyle.list,
                                         title: Text(
@@ -225,6 +227,27 @@ class _PostsPageState extends State<PostsPage> {
                         setState(() {
                           postsBloc.add(PostAddEvent());
                           Navigator.of(context).pop();
+                          final snackBar = SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            width: 300,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                    width: 0.5, color: Color(0xffd0cfed)),
+                                borderRadius: BorderRadius.circular(15)),
+                            backgroundColor: const Color(0xffd0cfed),
+                            content: const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text("New Content was added!"),
+                                Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  color: Colors.black,
+                                )
+                              ],
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         });
                       } else {
                         Fluttertoast.showToast(msg: "Comment is mandatory!");
