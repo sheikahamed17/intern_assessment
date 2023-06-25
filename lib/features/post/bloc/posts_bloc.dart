@@ -21,16 +21,18 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
     emit(PostFetchingSuccessfulState(posts: posts));
   }
 
-  FutureOr<void> postAddEvent(
+  FutureOr<bool> postAddEvent(
     PostAddEvent event,
     Emitter<PostsState> emit,
   ) async {
     bool success = await PostsRepo.addPost("new post");
-    print(success);
+    //print(success);
     if (success) {
       emit(PostsAdditionSuccessState());
+      return success;
     } else {
       emit(PostsAdditionErrorState());
+      return success;
     }
   }
 }

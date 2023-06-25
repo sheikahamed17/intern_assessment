@@ -21,6 +21,7 @@ class _PostsPageState extends State<PostsPage> {
   final GlobalKey<FormState> key = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  bool success = false;
   String name = "";
   String title = "";
   Widget build(BuildContext context) {
@@ -116,8 +117,7 @@ class _PostsPageState extends State<PostsPage> {
                             ),
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 2,
-                            width: MediaQuery.of(context).size.height / 2,
+                            height: MediaQuery.of(context).size.height / 10,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: ScreenSize.width * 0.045,
@@ -125,7 +125,6 @@ class _PostsPageState extends State<PostsPage> {
                               child: ListView.builder(
                                   itemCount: successState.posts.length,
                                   itemBuilder: (context, index) {
-                                    print(successState.posts[index].title);
                                     return Card(
                                       shape: RoundedRectangleBorder(
                                           side: const BorderSide(width: 0.5),
@@ -147,9 +146,11 @@ class _PostsPageState extends State<PostsPage> {
                                             overflow: TextOverflow.ellipsis,
                                             successState.posts[index].title),
                                         trailing: IconButton(
-                                          icon: const Icon(Icons.add),
+                                          icon: success
+                                              ? Icon(Icons.check)
+                                              : Icon(Icons.add),
                                           onPressed: () {
-                                            addPost();
+                                            success ? null : addPost();
                                           },
                                         ),
                                       ),
@@ -157,6 +158,39 @@ class _PostsPageState extends State<PostsPage> {
                                   }),
                             ),
                           ),
+                          success
+                              ? Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenSize.width * 0.045),
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: const BorderSide(width: 0.5),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    elevation: 1,
+                                    color: const Color(0xfff1f1f4),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage: const NetworkImage(
+                                            "https://www.google.com/s2/favicons?sz=64&domain_url=yahoo.com"),
+                                        backgroundColor: Colors.white,
+                                        radius: ScreenSize.height * 0.025,
+                                      ),
+                                      style: ListTileStyle.list,
+                                      title: Text(
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          title),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.add),
+                                        onPressed: () {
+                                          addPost();
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(),
                         ],
                       ),
                     );
@@ -226,6 +260,7 @@ class _PostsPageState extends State<PostsPage> {
                       if (key.currentState!.validate()) {
                         setState(() {
                           postsBloc.add(PostAddEvent());
+                          success = true;
                           Navigator.of(context).pop();
                           final snackBar = SnackBar(
                             behavior: SnackBarBehavior.floating,
@@ -248,6 +283,7 @@ class _PostsPageState extends State<PostsPage> {
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          _titleController.text = "";
                         });
                       } else {
                         Fluttertoast.showToast(msg: "Comment is mandatory!");
